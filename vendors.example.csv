@@ -1,0 +1,4 @@
+vendor_id,vendor_name,contact_email,address,tax_id,payment_terms
+V001,ABC Corporation,contact@abc-corp.com,"123 Main St, New York, NY 10001",12-3456789,NET30
+V002,XYZ Industries,info@xyz-industries.com,"456 Oak Ave, Los Angeles, CA 90001",98-7654321,NET45
+V003,Global Tech Solutions,sales@globaltech.com,"789 Tech Blvd, San Francisco, CA 94102",55-1234567,NET60
