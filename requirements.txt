@@ -13,9 +13,6 @@ python-json-logger>=2.0.0
 # Configuration
 PyYAML>=6.0
 
-# Email notifications
-smtplib-ssl>=1.0.0
-
 # Testing (optional)
 pytest>=7.2.0
 pytest-cov>=4.0.0
