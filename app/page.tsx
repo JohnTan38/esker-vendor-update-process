@@ -395,7 +395,15 @@ const EskerVendorGuide = () => {
                   {page.icon}
                 </div>
                 <div>
-                  <h2 className="text-3xl font-bold text-gray-900">{page.title}</h2>
+                  <h2
+                    className={`text-3xl font-bold ${
+                      page.id === 'overview'
+                        ? 'bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm'
+                        : 'text-gray-900'
+                    }`}
+                  >
+                    {page.title}
+                  </h2>
                   <p className="text-lg text-gray-600 mt-1">{page.subtitle}</p>
                 </div>
               </div>
