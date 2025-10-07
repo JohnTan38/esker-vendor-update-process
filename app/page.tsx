@@ -395,6 +395,27 @@ const EskerVendorGuide = () => {
                   {page.icon}
                 </div>
                 <div>
+                  
+                  <style jsx>{`
+                    .gradient-title {
+                      color: #1f2937; /* Fallback: solid gray-900 */
+                    }
+  
+                    @supports (background-clip: text) or (-webkit-background-clip: text) {
+                      .gradient-title {
+                       background: linear-gradient(to right, #4f46e5, #9333ea, #ec4899);
+                       -webkit-background-clip: text;
+                        background-clip: text;
+                        -webkit-text-fill-color: transparent;
+                        color: transparent;
+                      }
+                    }
+                  `}</style>
+                  <h2 className="text-3xl font-bold gradient-title">
+                    {page.title}
+                  </h2>
+
+                  {/*
                   <h2
                     className={`text-3xl font-bold ${
                       page.id === 'overview'
@@ -404,6 +425,7 @@ const EskerVendorGuide = () => {
                   >
                     {page.title}
                   </h2>
+                  */}
                   <p className="text-lg text-gray-600 mt-1">{page.subtitle}</p>
                 </div>
               </div>
