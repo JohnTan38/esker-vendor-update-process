@@ -398,7 +398,7 @@ const EskerVendorGuide = () => {
                   <h2
                     className={`text-3xl font-bold ${
                       page.id === 'overview'
-                        ? 'bg-gradient-to-r from-indigo-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm'
+                        ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent'
                         : 'text-gray-900'
                     }`}
                   >
