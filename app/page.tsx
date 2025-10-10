@@ -64,7 +64,12 @@ const EskerVendorGuide = () => {
         script.src = 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js';
         script.async = true;
         script.onload = () => {
-          window.mermaid.initialize({ 
+          if (!window.mermaid) {
+            console.error('Mermaid loaded without exposing the expected API.');
+            return;
+          }
+
+          window.mermaid.initialize({
             startOnLoad: true,
             theme: 'default',
             flowchart: {
@@ -85,11 +90,19 @@ const EskerVendorGuide = () => {
 
   // Render Mermaid diagram when it becomes visible
   useEffect(() => {
-    if (mermaidLoaded && currentPage === 4) {
-      setTimeout(() => {
-        window.mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-      }, 100);
+    if (typeof window === 'undefined' || !window.mermaid) {
+      return;
     }
+
+    if (mermaidLoaded && currentPage === 4) {
+      const timeoutId = window.setTimeout(() => {
+        window.mermaid?.init(undefined, document.querySelectorAll('.mermaid'));
+      }, 100);
+
+      return () => window.clearTimeout(timeoutId);
+    }
+
+    return;
   }, [mermaidLoaded, currentPage]);
 
   useEffect(() => {
