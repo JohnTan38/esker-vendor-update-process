@@ -1,19 +1,60 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
-import { FileText, Workflow, Code, CheckCircle, AlertCircle, Mail, Database, RefreshCw, Search, X } from 'lucide-react';
+import Image from 'next/image';
+import {
+  FileText,
+  Workflow,
+  Code,
+  CheckCircle,
+  AlertCircle,
+  Mail,
+  Database,
+  RefreshCw,
+  Search,
+  X,
+  Image as ImageIcon,
+  UploadCloud
+} from 'lucide-react';
+
+type MermaidAPI = {
+  initialize: (config: {
+    startOnLoad?: boolean;
+    theme?: string;
+    flowchart?: {
+      useMaxWidth?: boolean;
+      htmlLabels?: boolean;
+      curve?: string;
+    };
+  }) => void;
+  init: (config?: unknown, nodes?: NodeListOf<Element> | Element | string) => void;
+};
 
 // Extend Window type to include mermaid
 declare global {
   interface Window {
-    mermaid?: any;
+    mermaid?: MermaidAPI;
   }
 }
+
+const DEFAULT_IMAGE_SRC = '/vendor_update_process_3d.jpg';
+const DEFAULT_IMAGE_NAME = 'vendor_update_process_3d.jpg';
 
 const EskerVendorGuide = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [mermaidLoaded, setMermaidLoaded] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string>(DEFAULT_IMAGE_SRC);
+  const [uploadedImageName, setUploadedImageName] = useState(DEFAULT_IMAGE_NAME);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const isCustomImage = uploadedImage !== DEFAULT_IMAGE_SRC;
+  const imageAltText = isCustomImage
+    ? uploadedImageName || 'Uploaded vendor process visual'
+    : 'Default Esker vendor update process illustration';
+  const shouldUnoptimizeImage = uploadedImage.startsWith('data:');
+  const displayedImageName = isCustomImage
+    ? uploadedImageName
+    : `${DEFAULT_IMAGE_NAME} (default)`;
 
   // Load Mermaid library
   useEffect(() => {
@@ -50,6 +91,69 @@ const EskerVendorGuide = () => {
       }, 100);
     }
   }, [mermaidLoaded, currentPage]);
+
+  useEffect(() => {
+    if (!isImageModalOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsImageModalOpen(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isImageModalOpen]);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const fileInput = event.target;
+    const file = fileInput.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setImageUploadError('Please select a valid image file.');
+      setIsImageModalOpen(false);
+      fileInput.value = '';
+      return;
+    }
+
+    const maxBytes = 5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      setImageUploadError('Image must be 5 MB or smaller.');
+      setIsImageModalOpen(false);
+      fileInput.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUploadedImage(reader.result as string);
+      setUploadedImageName(file.name);
+      setImageUploadError(null);
+      setIsImageModalOpen(true);
+    };
+
+    reader.readAsDataURL(file);
+    fileInput.value = '';
+  };
+
+  const closeImageModal = () => {
+    setIsImageModalOpen(false);
+  };
+
+  const clearUploadedImage = () => {
+    setUploadedImage(DEFAULT_IMAGE_SRC);
+    setUploadedImageName(DEFAULT_IMAGE_NAME);
+    setImageUploadError(null);
+    setIsImageModalOpen(false);
+  };
 
   const pages = [
     {
@@ -306,7 +410,8 @@ const EskerVendorGuide = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <>
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Sidebar */}
       <aside className="w-72 bg-white shadow-2xl hidden lg:block border-r border-gray-200">
         <div className="p-6 bg-gradient-to-r from-indigo-600 to-blue-600">
@@ -411,11 +516,12 @@ const EskerVendorGuide = () => {
                       }
                     }
                   `}</style>
+
                   <h2 className="text-3xl font-bold gradient-title">
                     {page.title}
                   </h2>
 
-                  {/*
+                  {/* 
                   <h2
                     className={`text-3xl font-bold ${
                       page.id === 'overview'
@@ -426,6 +532,7 @@ const EskerVendorGuide = () => {
                     {page.title}
                   </h2>
                   */}
+
                   <p className="text-lg text-gray-600 mt-1">{page.subtitle}</p>
                 </div>
               </div>
@@ -517,9 +624,140 @@ const EskerVendorGuide = () => {
               </button>
             </div>
           </div>
+
+          {/* Uploaded Image Section */}
+          <section className="mt-10">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+              <div className="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-indigo-100 text-indigo-600">
+                    <ImageIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">Visual Reference</h3>
+                  <p className="text-sm text-gray-500">
+                    Upload the latest vendor process map for quick sharing with your team.
+                  </p>
+                </div>
+              </div>
+              {isCustomImage && (
+                <button
+                  onClick={clearUploadedImage}
+                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                >
+                  Remove image
+                </button>
+              )}
+            </div>
+
+            <div className="p-6 space-y-4">
+              <label
+                htmlFor="process-image-upload"
+                className="group relative flex flex-col items-center justify-center w-full border-2 border-dashed border-indigo-200 rounded-xl p-6 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition-colors text-center"
+              >
+                <UploadCloud className="w-10 h-10 text-indigo-400 group-hover:text-indigo-600 transition-colors" />
+                <span className="mt-3 text-sm font-semibold text-indigo-600 group-hover:text-indigo-700">
+                  Click to upload process image
+                </span>
+                <span className="text-xs text-gray-500 mt-1">Accepts PNG, JPG, or GIF (max 5 MB)</span>
+                <input
+                  id="process-image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
+
+              {imageUploadError && (
+                <p className="text-sm text-red-600 font-medium">{imageUploadError}</p>
+              )}
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-sm font-medium text-gray-700 truncate">
+                    {displayedImageName}
+                  </p>
+                  <button
+                    onClick={() => setIsImageModalOpen(true)}
+                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                  >
+                    View larger
+                  </button>
+                </div>
+                <div
+                  className="relative h-60 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 cursor-zoom-in"
+                  onClick={() => setIsImageModalOpen(true)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setIsImageModalOpen(true);
+                    }
+                  }}
+                  aria-label="Open vendor process image in modal"
+                >
+                  <Image
+                    src={uploadedImage}
+                    alt={imageAltText}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 50vw"
+                    className="object-contain transition-transform duration-200 hover:scale-[1.01]"
+                    priority={!isCustomImage}
+                    unoptimized={shouldUnoptimizeImage}
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  Select the preview or the button above to open a full-size modal view.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
         </div>
-      </main>
-    </div>
+    </main>
+  </div>
+
+  {isImageModalOpen && uploadedImage && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4"
+          onClick={closeImageModal}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Uploaded vendor process image"
+        >
+          <div
+            className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              onClick={closeImageModal}
+              className="absolute top-4 right-4 p-2 bg-black/40 hover:bg-black/60 rounded-full text-white transition-colors"
+              aria-label="Close image preview"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          <div className="relative h-[80vh] bg-gray-900">
+            <Image
+              src={uploadedImage}
+              alt={imageAltText}
+              fill
+              sizes="100vw"
+              className="object-contain"
+              priority={!isCustomImage}
+              unoptimized={shouldUnoptimizeImage}
+            />
+          </div>
+          {displayedImageName && (
+            <div className="px-6 py-4 text-sm text-gray-600 border-t border-gray-200 bg-gray-50">
+              {displayedImageName}
+            </div>
+          )}
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
