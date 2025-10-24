@@ -13,7 +13,12 @@ import {
   Search,
   X,
   Image as ImageIcon,
-  UploadCloud
+  UploadCloud,
+  MousePointerClick,
+  PlayCircle,
+  ClipboardCheck,
+  Moon,
+  Sun
 } from 'lucide-react';
 
 type MermaidAPI = {
@@ -36,8 +41,8 @@ declare global {
   }
 }
 
-const DEFAULT_IMAGE_SRC = '/vendor_update_process_3d.jpg';
-const DEFAULT_IMAGE_NAME = 'vendor_update_process_3d.jpg';
+const DEFAULT_IMAGE_SRC = '/vendor_update_process_ghibli_style.jpg';
+const DEFAULT_IMAGE_NAME = 'vendor_update_process_ghibli_style.jpg';
 
 const EskerVendorGuide = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -47,6 +52,7 @@ const EskerVendorGuide = () => {
   const [uploadedImageName, setUploadedImageName] = useState(DEFAULT_IMAGE_NAME);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const isCustomImage = uploadedImage !== DEFAULT_IMAGE_SRC;
   const imageAltText = isCustomImage
     ? uploadedImageName || 'Uploaded vendor process visual'
@@ -104,6 +110,26 @@ const EskerVendorGuide = () => {
 
     return;
   }, [mermaidLoaded, currentPage]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const storedTheme = window.localStorage.getItem('esker-theme');
+    if (storedTheme === 'dark') {
+      setIsDarkMode(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.localStorage.setItem('esker-theme', isDarkMode ? 'dark' : 'light');
+    document.documentElement.classList.toggle('dark', isDarkMode);
+  }, [isDarkMode]);
 
   useEffect(() => {
     if (!isImageModalOpen) {
@@ -167,6 +193,30 @@ const EskerVendorGuide = () => {
     setImageUploadError(null);
     setIsImageModalOpen(false);
   };
+
+  const quickstartVisuals = [
+    {
+      id: 'user-guide-step-1',
+      image: '/user_guide_1.png',
+      title: 'Open the vendor canvas app',
+      description: 'In Power Apps, locate the vendor application under My apps so you can launch the Esker vendor workflow.',
+      note: 'click on vendor app'
+    },
+    {
+      id: 'user-guide-step-2',
+      image: '/user_guide_2.png',
+      title: 'Start the app preview',
+      description: 'Select the Play control in the top-right corner to enter the interactive app preview experience.',
+      note: 'click Play button'
+    },
+    {
+      id: 'user-guide-step-3',
+      image: '/user_guide_3.png',
+      title: 'Complete the form and send the email',
+      description: 'Fill in every required field. The vendor number accepts numeric values only. When all fields are complete, choose Send Email to dispatch the update.',
+      note: 'fill in all fields (required), vendor number only accepts numeric, click Send Email'
+    }
+  ];
 
   const pages = [
     {
@@ -277,6 +327,32 @@ const EskerVendorGuide = () => {
       icon: <Workflow className="w-6 h-6" />,
       searchTerms: ['workflow', 'diagram', 'flowchart', 'visual', 'mermaid', 'process flow'],
       isWorkflow: true
+    },
+    {
+      id: 'user-guide',
+      title: 'User Guide & Quickstart',
+      subtitle: 'Step-by-step walkthrough with visuals',
+      icon: <PlayCircle className="w-6 h-6" />,
+      searchTerms: ['user guide', 'quickstart', 'tutorial', 'getting started', 'play', 'launch'],
+      content: [
+        {
+          heading: 'Launch the vendor app',
+          text: 'Open Power Apps and choose the vendor canvas application from My apps to begin the Esker update process.',
+          icon: <MousePointerClick className="w-5 h-5" />,
+          highlight: true
+        },
+        {
+          heading: 'Use preview mode to run the app',
+          text: 'Select the play control in the upper-right corner to launch the interactive preview so you can enter vendor information.',
+          icon: <PlayCircle className="w-5 h-5" />
+        },
+        {
+          heading: 'Complete required fields then send the email',
+          text: 'Populate every required field. The vendor number accepts numeric values only. When validation passes, select Send Email to dispatch the vendor update.',
+          icon: <ClipboardCheck className="w-5 h-5" />,
+          highlight: true
+        }
+      ]
     }
   ];
 
@@ -315,47 +391,51 @@ const EskerVendorGuide = () => {
     setCurrentPage(0);
   };
 
+  const toggleTheme = () => {
+    setIsDarkMode((previous) => !previous);
+  };
+
   const WorkflowDiagram = () => (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-xl border-2 border-indigo-200">
-      <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-xl border-2 border-indigo-200 transition-colors duration-300 dark:bg-slate-900 dark:bg-none dark:border-indigo-500/40">
+      <div className="bg-white p-6 rounded-lg shadow-md mb-6 dark:bg-slate-900 dark:border dark:border-slate-700">
+        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2 dark:text-slate-100">
           <Workflow className="w-6 h-6 text-indigo-600" />
           Process Flow Stages
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
-            <h4 className="font-semibold text-blue-900 mb-2">1. User Input</h4>
-            <p className="text-sm text-blue-800">Form validation and email submission</p>
+          <div className="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500 dark:bg-slate-800 dark:border-blue-500/60">
+            <h4 className="font-semibold text-blue-900 mb-2 dark:text-blue-200">1. User Input</h4>
+            <p className="text-sm text-blue-800 dark:text-blue-200/80">Form validation and email submission</p>
           </div>
-          <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
-            <h4 className="font-semibold text-green-900 mb-2">2. Email Dispatch</h4>
-            <p className="text-sm text-green-800">Outlook integration and confirmation</p>
+          <div className="p-4 bg-green-50 rounded-lg border-l-4 border-green-500 dark:bg-slate-800 dark:border-green-500/60">
+            <h4 className="font-semibold text-green-900 mb-2 dark:text-green-200">2. Email Dispatch</h4>
+            <p className="text-sm text-green-800 dark:text-green-200/80">Outlook integration and confirmation</p>
           </div>
-          <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
-            <h4 className="font-semibold text-purple-900 mb-2">3. Script Trigger</h4>
-            <p className="text-sm text-purple-800">Scheduled Python automation</p>
+          <div className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500 dark:bg-slate-800 dark:border-purple-500/60">
+            <h4 className="font-semibold text-purple-900 mb-2 dark:text-purple-200">3. Script Trigger</h4>
+            <p className="text-sm text-purple-800 dark:text-purple-200/80">Scheduled Python automation</p>
           </div>
-          <div className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500">
-            <h4 className="font-semibold text-orange-900 mb-2">4. Data Processing</h4>
-            <p className="text-sm text-orange-800">Parse and validate vendor data</p>
+          <div className="p-4 bg-orange-50 rounded-lg border-l-4 border-orange-500 dark:bg-slate-800 dark:border-orange-500/60">
+            <h4 className="font-semibold text-orange-900 mb-2 dark:text-orange-200">4. Data Processing</h4>
+            <p className="text-sm text-orange-800 dark:text-orange-200/80">Parse and validate vendor data</p>
           </div>
-          <div className="p-4 bg-amber-50 rounded-lg border-l-4 border-amber-500">
-            <h4 className="font-semibold text-amber-900 mb-2">5. Esker Update</h4>
-            <p className="text-sm text-amber-800">System synchronization</p>
+          <div className="p-4 bg-amber-50 rounded-lg border-l-4 border-amber-500 dark:bg-slate-800 dark:border-amber-500/60">
+            <h4 className="font-semibold text-amber-900 mb-2 dark:text-amber-200">5. Esker Update</h4>
+            <p className="text-sm text-amber-800 dark:text-amber-200/80">System synchronization</p>
           </div>
-          <div className="p-4 bg-emerald-50 rounded-lg border-l-4 border-emerald-500">
-            <h4 className="font-semibold text-emerald-900 mb-2">6. Completion</h4>
-            <p className="text-sm text-emerald-800">Success logging and archival</p>
+          <div className="p-4 bg-emerald-50 rounded-lg border-l-4 border-emerald-500 dark:bg-slate-800 dark:border-emerald-500/60">
+            <h4 className="font-semibold text-emerald-900 mb-2 dark:text-emerald-200">6. Completion</h4>
+            <p className="text-sm text-emerald-800 dark:text-emerald-200/80">Success logging and archival</p>
           </div>
         </div>
       </div>
       
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Detailed Workflow Diagram</h3>
-        <p className="text-sm text-gray-600 mb-4 italic">
+      <div className="bg-white p-6 rounded-lg shadow-md dark:bg-slate-900 dark:border dark:border-slate-700">
+        <h3 className="text-xl font-bold text-gray-800 mb-4 dark:text-slate-100">Detailed Workflow Diagram</h3>
+        <p className="text-sm text-gray-600 mb-4 italic dark:text-slate-300">
           The workflow encompasses user interaction, email automation, scheduled processing, and system integration
         </p>
-        <div className="overflow-x-auto bg-white p-4 rounded-lg border border-gray-200">
+        <div className="overflow-x-auto bg-white p-4 rounded-lg border border-gray-200 dark:bg-slate-900 dark:border-slate-700">
           <div className="mermaid">
 {`graph TD
     A[User Access Form] --> B{All Fields Filled?}
@@ -412,8 +492,8 @@ const EskerVendorGuide = () => {
     style AD fill:#4caf50,color:#fff
     style Q fill:#9c27b0,color:#fff`}
           </div>
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-900">
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200 dark:bg-slate-800 dark:border-blue-500/60">
+            <p className="text-sm text-blue-900 dark:text-blue-200">
               <strong>Note:</strong> The diagram shows the complete end-to-end process from form submission to Esker system update, including validation checkpoints, error handling, and retry logic.
             </p>
           </div>
@@ -424,9 +504,15 @@ const EskerVendorGuide = () => {
 
   return (
     <>
-      <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div
+        className={`flex min-h-screen transition-colors duration-300 ${
+          isDarkMode
+            ? 'bg-slate-950 text-slate-100'
+            : 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900'
+        }`}
+      >
       {/* Sidebar */}
-      <aside className="w-72 bg-white shadow-2xl hidden lg:block border-r border-gray-200">
+      <aside className="w-72 bg-white shadow-2xl hidden lg:block border-r border-gray-200 transition-colors duration-300 dark:bg-slate-900 dark:border-slate-800">
         <div className="p-6 bg-gradient-to-r from-indigo-600 to-blue-600">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
@@ -440,7 +526,7 @@ const EskerVendorGuide = () => {
         {/* Enhanced Search Section */}
         <div className="p-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-slate-500" />
             <input
               type="text"
               placeholder="Search documentation..."
@@ -449,12 +535,12 @@ const EskerVendorGuide = () => {
                 setSearchQuery(e.target.value);
                 setCurrentPage(0);
               }}
-              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
+              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm transition-colors duration-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-100 dark:focus:ring-indigo-400 dark:placeholder-slate-400"
             />
             {searchQuery && (
               <button
                 onClick={clearSearch}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors dark:text-slate-500 dark:hover:text-slate-300"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -463,7 +549,7 @@ const EskerVendorGuide = () => {
           
           {/* Search Results Counter */}
           {searchQuery && (
-            <div className="mt-2 text-xs text-gray-600 px-2">
+            <div className="mt-2 text-xs text-gray-600 px-2 dark:text-slate-400">
               {filteredPages.length} {filteredPages.length === 1 ? 'result' : 'results'} found
             </div>
           )}
@@ -477,23 +563,23 @@ const EskerVendorGuide = () => {
               className={`w-full text-left p-3 rounded-lg transition-all duration-200 flex items-center gap-3 ${
                 currentPage === index
                   ? 'bg-indigo-600 text-white shadow-lg transform scale-105'
-                  : 'text-gray-700 hover:bg-gray-100'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-slate-200 dark:hover:bg-slate-800'
               }`}
             >
-              <span className={currentPage === index ? 'text-white' : 'text-indigo-600'}>
+              <span className={currentPage === index ? 'text-white' : 'text-indigo-600 dark:text-indigo-300'}>
                 {p.icon}
               </span>
-              <span className="font-medium text-sm">{p.title}</span>
+              <span className="font-medium text-sm dark:text-slate-100">{p.title}</span>
             </button>
           ))}
           {filteredPages.length === 0 && (
             <div className="text-center py-8">
-              <Search className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm font-medium">No results found</p>
-              <p className="text-gray-400 text-xs mt-1">Try a different search term</p>
+              <Search className="w-12 h-12 text-gray-300 mx-auto mb-3 dark:text-slate-600" />
+              <p className="text-gray-500 text-sm font-medium dark:text-slate-300">No results found</p>
+              <p className="text-gray-400 text-xs mt-1 dark:text-slate-500">Try a different search term</p>
               <button
                 onClick={clearSearch}
-                className="mt-4 px-4 py-2 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-medium hover:bg-indigo-200 transition-colors"
+                className="mt-4 px-4 py-2 bg-indigo-100 text-indigo-600 rounded-lg text-xs font-medium hover:bg-indigo-200 transition-colors dark:bg-indigo-900/50 dark:text-indigo-300 dark:hover:bg-indigo-900/70"
               >
                 Clear Search
               </button>
@@ -506,10 +592,10 @@ const EskerVendorGuide = () => {
       <main className="flex-1 p-6 lg:p-10">
         <div className="max-w-6xl mx-auto">
           {/* Header Card */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-200">
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 border border-gray-200 transition-colors duration-300 dark:bg-slate-900 dark:border-slate-700">
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-4">
-                <div className="p-3 bg-indigo-100 rounded-xl">
+                <div className="p-3 bg-indigo-100 rounded-xl dark:bg-indigo-900/50">
                   {page.icon}
                 </div>
                 <div>
@@ -546,66 +632,126 @@ const EskerVendorGuide = () => {
                   </h2>
                   */}
 
-                  <p className="text-lg text-gray-600 mt-1">{page.subtitle}</p>
+                  <p className="text-lg text-gray-600 mt-1 dark:text-slate-300">{page.subtitle}</p>
                 </div>
               </div>
-              <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
-                <span className="text-sm font-medium text-gray-700">
-                  Page {currentPage + 1} of {filteredPages.length}
-                </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="flex items-center gap-2 px-3 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800"
+                  aria-label={`Activate ${isDarkMode ? 'light' : 'dark'} mode`}
+                >
+                  {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                  <span>{isDarkMode ? 'Light mode' : 'Dark mode'}</span>
+                </button>
+                <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full dark:bg-slate-800">
+                  <span className="text-sm font-medium text-gray-700 dark:text-slate-300">
+                    Page {currentPage + 1} of {filteredPages.length}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Content Area */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200 transition-colors duration-300 dark:bg-slate-900 dark:border-slate-700">
             {page.isWorkflow ? (
               <WorkflowDiagram />
             ) : (
-              <div className="space-y-6">
-                {page.content && page.content.map((section, index) => (
-                  <div
-                    key={index}
-                    className={`p-6 rounded-xl transition-all duration-300 ${
-                      section.highlight
-                        ? 'bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200'
-                        : 'bg-gray-50 border border-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`p-2 rounded-lg ${
-                        section.highlight ? 'bg-indigo-600' : 'bg-gray-300'
-                      }`}>
-                        {React.cloneElement(section.icon, {
-                          className: `w-5 h-5 ${section.highlight ? 'text-white' : 'text-gray-700'}`
-                        })}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 mb-3">
-                          {section.heading}
-                        </h3>
-                        <p className="text-gray-700 leading-relaxed">
-                          {section.text}
-                        </p>
+              <>
+                <div className="space-y-6">
+                  {page.content && page.content.map((section, index) => (
+                    <div
+                      key={index}
+                      className={`p-6 rounded-xl transition-all duration-300 ${
+                        section.highlight
+                          ? 'bg-gradient-to-r from-indigo-50 to-blue-50 border-2 border-indigo-200 dark:from-indigo-900/40 dark:to-blue-900/30 dark:border-indigo-500/60'
+                          : 'bg-gray-50 border border-gray-200 dark:bg-slate-800 dark:border-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className={`p-2 rounded-lg ${
+                          section.highlight
+                            ? 'bg-indigo-600 dark:bg-indigo-500'
+                            : 'bg-gray-300 dark:bg-slate-700'
+                        }`}>
+                          {React.cloneElement(section.icon, {
+                            className: `w-5 h-5 ${
+                              section.highlight ? 'text-white' : 'text-gray-700 dark:text-slate-200'
+                            }`
+                          })}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-gray-900 mb-3 dark:text-slate-100">
+                            {section.heading}
+                          </h3>
+                          <p className="text-gray-700 leading-relaxed dark:text-slate-300">
+                            {section.text}
+                          </p>
+                        </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+
+                {page.id === 'user-guide' && (
+                  <div className="mt-8 space-y-4">
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+                        Quickstart Visual Guide
+                      </h3>
+                      <p className="text-gray-600 mt-2 dark:text-slate-300">
+                        Follow these annotated screenshots for a rapid walkthrough of the Esker vendor update submission.
+                      </p>
+                    </div>
+                    <div className="grid gap-6 lg:grid-cols-3">
+                      {quickstartVisuals.map((step) => (
+                        <div
+                          key={step.id}
+                          className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl dark:border-slate-700 dark:bg-slate-900"
+                        >
+                          <div className="relative w-full aspect-[16/9] bg-gray-100 dark:bg-slate-800">
+                            <Image
+                              src={step.image}
+                              alt={step.title}
+                              fill
+                              sizes="(max-width: 1024px) 100vw, 33vw"
+                              className="object-cover"
+                              priority={false}
+                            />
+                          </div>
+                          <div className="p-5 space-y-2">
+                            <h4 className="text-lg font-semibold text-gray-900 dark:text-slate-100">
+                              {step.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 dark:text-slate-300">
+                              {step.description}
+                            </p>
+                            <p className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+                              {step.note}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
 
             {/* Navigation */}
-            <div className="flex justify-between items-center mt-10 pt-6 border-t border-gray-200">
+            <div className="flex justify-between items-center mt-10 pt-6 border-t border-gray-200 dark:border-slate-700">
               <button
                 onClick={handlePrevious}
                 disabled={currentPage === 0}
                 className={`px-6 py-3 rounded-full font-semibold transition-all duration-200 flex items-center gap-2 ${
                   currentPage === 0
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600'
                     : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg transform hover:scale-105'
                 }`}
               >
-                <span>←</span>
+                <span>&lt;</span>
                 <span>Previous</span>
               </button>
 
@@ -617,7 +763,7 @@ const EskerVendorGuide = () => {
                     className={`w-3 h-3 rounded-full transition-all duration-200 ${
                       currentPage === index
                         ? 'bg-indigo-600 w-8'
-                        : 'bg-gray-300 hover:bg-gray-400'
+                        : 'bg-gray-300 hover:bg-gray-400 dark:bg-slate-700 dark:hover:bg-slate-600'
                     }`}
                   />
                 ))}
@@ -628,27 +774,27 @@ const EskerVendorGuide = () => {
                 disabled={currentPage === filteredPages.length - 1}
                 className={`px-6 py-3 rounded-full font-semibold transition-all duration-200 flex items-center gap-2 ${
                   currentPage === filteredPages.length - 1
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-slate-800 dark:text-slate-600'
                     : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-lg transform hover:scale-105'
                 }`}
               >
                 <span>Next</span>
-                <span>→</span>
+                <span>&gt;</span>
               </button>
             </div>
           </div>
 
           {/* Uploaded Image Section */}
           <section className="mt-10">
-            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-              <div className="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden transition-colors duration-300 dark:bg-slate-900 dark:border-slate-700">
+              <div className="p-6 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4 dark:border-slate-700/80">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-indigo-100 text-indigo-600">
+                  <div className="p-2 rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/50 dark:text-indigo-300">
                     <ImageIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Visual Reference</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-slate-100">Visual Reference</h3>
+                  <p className="text-sm text-gray-500 dark:text-slate-400">
                     Upload the latest vendor process map for quick sharing with your team.
                   </p>
                 </div>
@@ -656,7 +802,7 @@ const EskerVendorGuide = () => {
               {isCustomImage && (
                 <button
                   onClick={clearUploadedImage}
-                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors dark:text-indigo-300 dark:hover:text-indigo-200"
                 >
                   Remove image
                 </button>
@@ -666,13 +812,13 @@ const EskerVendorGuide = () => {
             <div className="p-6 space-y-4">
               <label
                 htmlFor="process-image-upload"
-                className="group relative flex flex-col items-center justify-center w-full border-2 border-dashed border-indigo-200 rounded-xl p-6 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition-colors text-center"
+                className="group relative flex flex-col items-center justify-center w-full border-2 border-dashed border-indigo-200 rounded-xl p-6 cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 transition-colors text-center dark:border-indigo-500/40 dark:hover:border-indigo-400 dark:hover:bg-slate-900"
               >
-                <UploadCloud className="w-10 h-10 text-indigo-400 group-hover:text-indigo-600 transition-colors" />
-                <span className="mt-3 text-sm font-semibold text-indigo-600 group-hover:text-indigo-700">
+                <UploadCloud className="w-10 h-10 text-indigo-400 group-hover:text-indigo-600 transition-colors dark:text-indigo-300" />
+                <span className="mt-3 text-sm font-semibold text-indigo-600 group-hover:text-indigo-700 dark:text-indigo-300 dark:group-hover:text-indigo-200">
                   Click to upload process image
                 </span>
-                <span className="text-xs text-gray-500 mt-1">Accepts PNG, JPG, or GIF (max 5 MB)</span>
+                <span className="text-xs text-gray-500 mt-1 dark:text-slate-400">Accepts PNG, JPG, or GIF (max 5 MB)</span>
                 <input
                   id="process-image-upload"
                   type="file"
@@ -683,23 +829,23 @@ const EskerVendorGuide = () => {
               </label>
 
               {imageUploadError && (
-                <p className="text-sm text-red-600 font-medium">{imageUploadError}</p>
+                <p className="text-sm text-red-600 font-medium dark:text-red-400">{imageUploadError}</p>
               )}
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-gray-700 truncate">
+                  <p className="text-sm font-medium text-gray-700 truncate dark:text-slate-200">
                     {displayedImageName}
                   </p>
                   <button
                     onClick={() => setIsImageModalOpen(true)}
-                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                    className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors dark:text-indigo-300 dark:hover:text-indigo-200"
                   >
                     View larger
                   </button>
                 </div>
                 <div
-                  className="relative h-60 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 cursor-zoom-in"
+                  className="relative h-60 overflow-hidden rounded-xl border border-gray-200 bg-gray-50 cursor-zoom-in dark:bg-slate-800 dark:border-slate-700"
                   onClick={() => setIsImageModalOpen(true)}
                   role="button"
                   tabIndex={0}
@@ -721,7 +867,7 @@ const EskerVendorGuide = () => {
                     unoptimized={shouldUnoptimizeImage}
                   />
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-slate-400">
                   Select the preview or the button above to open a full-size modal view.
                 </p>
               </div>
@@ -741,7 +887,7 @@ const EskerVendorGuide = () => {
           aria-label="Uploaded vendor process image"
         >
           <div
-            className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden dark:bg-slate-900"
             onClick={(event) => event.stopPropagation()}
           >
             <button
@@ -763,7 +909,7 @@ const EskerVendorGuide = () => {
             />
           </div>
           {displayedImageName && (
-            <div className="px-6 py-4 text-sm text-gray-600 border-t border-gray-200 bg-gray-50">
+            <div className="px-6 py-4 text-sm text-gray-600 border-t border-gray-200 bg-gray-50 dark:text-slate-300 dark:border-slate-700 dark:bg-slate-900">
               {displayedImageName}
             </div>
           )}
