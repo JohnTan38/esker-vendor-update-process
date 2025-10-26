@@ -43,6 +43,7 @@ declare global {
 
 const DEFAULT_IMAGE_SRC = '/vendor_update_process_ghibli_style.jpg';
 const DEFAULT_IMAGE_NAME = 'vendor_update_process_ghibli_style.jpg';
+const TRAINING_VIDEO_PATH = '/unpacking%20smart%20automations.mp4';
 
 const EskerVendorGuide = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -867,9 +868,20 @@ const EskerVendorGuide = () => {
                     unoptimized={shouldUnoptimizeImage}
                   />
                 </div>
-                <p className="text-xs text-gray-500 dark:text-slate-400">
-                  Select the preview or the button above to open a full-size modal view.
-                </p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs text-gray-500 dark:text-slate-400">
+                    Select the preview or the button above to open a full-size modal view.
+                  </p>
+                  <a
+                    href={TRAINING_VIDEO_PATH}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+                  >
+                    <PlayCircle className="h-4 w-4" />
+                    Play Video
+                  </a>
+                </div>
               </div>
             </div>
           </div>
